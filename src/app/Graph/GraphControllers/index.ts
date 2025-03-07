@@ -44,7 +44,7 @@ export const useGraphHighlight = (cy: cytoscape.Core | null) => {
   const iterateAndHighlight = async (elementIds: string[], time: number) => {
     setIsRunning(true);
     isRunningRef.current = true;
-
+    let complete = false
     for (const id of elementIds) {
       if (!isRunningRef.current) return;
 
@@ -59,6 +59,8 @@ export const useGraphHighlight = (cy: cytoscape.Core | null) => {
     highlightElement(elementIds[-1])
     setIsRunning(false);
     isRunningRef.current = false;
+    complete = true
+    return complete
   };
 
   return { highlightElement, resetElement, iterateAndHighlight, togglePause, elementFound };
