@@ -11,17 +11,14 @@ export interface GraphElement {
   };
 }
 
-export function jsonToGraph(jsonData: json): GraphElement[] {
+export function jsonToGraph(jsonData: json | json[]): GraphElement[] {
   const elements: GraphElement[] = [];
   
   function traverse(node: json) {
-    // Add node
     elements.push({ data: { id: node.val } });
     
-    // Add edges and process children
     for (const child of node.children) {
       traverse(child);
-      // Add edge
       elements.push({
         data: {
           id: `${node.val}${child.val}`,
@@ -32,24 +29,25 @@ export function jsonToGraph(jsonData: json): GraphElement[] {
     }
   }
   
-  traverse(jsonData);
+  if (Array.isArray(jsonData)) {
+    jsonData.forEach(graph => traverse(graph));
+  } else {
+    traverse(jsonData);
+  }
+  
   return elements;
 }
 
-export function graphTojson(elements: GraphElement[]): json {
-  // First, separate nodes and edges
+export function graphTojson(elements: GraphElement[]): json[] {
   const nodes = elements.filter(el => !el.data.source);
   const edges = elements.filter(el => el.data.source);
   
-  // Create a map of nodes with their children
   const nodeMap = new Map<string, string[]>();
   
-  // Initialize empty arrays for all nodes
   nodes.forEach(node => {
     nodeMap.set(node.data.id, []);
   });
   
-  // Add children based on edges
   edges.forEach(edge => {
     const source = edge.data.source!;
     const target = edge.data.target!;
@@ -58,18 +56,35 @@ export function graphTojson(elements: GraphElement[]): json {
     nodeMap.set(source, children);
   });
   
-  function buildTree(nodeId: string): json {
+  function buildTree(nodeId: string, visited: Set<string>): json {
+    visited.add(nodeId);
     return {
       val: nodeId,
-      children: (nodeMap.get(nodeId) || []).map(childId => buildTree(childId))
+      children: (nodeMap.get(nodeId) || [])
+        .map(childId => buildTree(childId, visited))
     };
   }
   
-  const rootId = nodes.find(node => 
+  const rootNodes = nodes.filter(node => 
     !edges.some(edge => edge.data.target === node.data.id)
-  )?.data.id;
+  );
+
+  if (rootNodes.length === 0) return [];
+
+  const visited = new Set<string>();
+  const graphs: json[] = [];
+
+  rootNodes.forEach(root => {
+    if (!visited.has(root.data.id)) {
+      graphs.push(buildTree(root.data.id, visited));
+    }
+  });
+
+  nodes.forEach(node => {
+    if (!visited.has(node.data.id)) {
+      graphs.push(buildTree(node.data.id, visited));
+    }
+  });
   
-  if (!rootId) return null
-  
-  return buildTree(rootId);
+  return graphs;
 }

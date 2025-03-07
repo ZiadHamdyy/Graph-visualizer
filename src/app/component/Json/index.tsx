@@ -43,11 +43,13 @@ const Json = ({ jsonWindow, setJsonWindow }: JsonType) => {
     }, null, 2));
     const dispatch = useDispatch();
     const elements = useSelector(selectAllElements);
-    useEffect(() => {
-        const treeData = graphTojson(elements as GraphElement[]);
-        if (!treeData) return;
+        useEffect(() => {
+        const treesData = graphTojson(elements as GraphElement[]);
+        console.log(treesData)
+        if (!treesData || treesData.length === 0) return;
         
-        const updatedJson = JSON.stringify(treeData, null, 2);
+        const jsonData = treesData.length === 1 ? treesData[0] : treesData;
+        const updatedJson = JSON.stringify(jsonData, null, 2);
         
         if (updatedJson !== jsonValue) {
             setJsonValue(updatedJson);
@@ -91,7 +93,6 @@ const Json = ({ jsonWindow, setJsonWindow }: JsonType) => {
                             </svg>
                             Back
                         </button>
-                        {/* <h3 className="font-semibold text-gray-700">JSON Editor</h3> */}
                     </div>
                 </div>
                 <div className="flex h-[calc(100%-3rem)] gap-4 p-4">
