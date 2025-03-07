@@ -1,82 +1,65 @@
+import { sleep } from "@/app/utils/sleep";
 import cytoscape from "cytoscape";
+import { useState, useRef } from "react";
 
-export interface GraphController {
-  addNode: (nodeId: string) => void;
-  deleteNode: (nodeId: string) => void;
-  addEdge: (sourceId: string, targetId: string) => void;
-  deleteEdge: (sourceId: string, targetId: string) => void;
-}
+export const useGraphHighlight = (cy: cytoscape.Core | null) => {
+  const [isPaused, setIsPaused] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
+  const isPausedRef = useRef(isPaused);
+  const isRunningRef = useRef(isRunning);
 
-export const createGraphController = (cy: cytoscape.Core): GraphController => {
-  const addNode = (nodeId: string) => {
-    if (!cy || nodeId.trim() === "") return;
-
-    try {
-      cy.add({
-        group: "nodes",
-        data: { id: nodeId },
-      });
-      cy.layout({ name: "dagre" }).run();
-    } catch (error) {
-      console.error("Error adding node:", error);
-    }
+  const togglePause = () => {
+    setIsPaused((prev) => {
+      isPausedRef.current = !prev;
+      return !prev;
+    });
   };
 
-  const deleteNode = (nodeId: string) => {
+  const highlightElement = (elementId: string) => {
     if (!cy) return;
-
-    try {
-      const nodeToRemove = cy.$(`#${nodeId}`);
-      if (nodeToRemove.length > 0) {
-        cy.remove(nodeToRemove);
-        cy.layout({ name: "dagre" }).run();
-      }
-    } catch (error) {
-      console.error("Error deleting node:", error);
-    }
+    cy.elements().removeClass("highlighte");
+    cy.getElementById(elementId).addClass("highlighted highlighte");
   };
 
-  const addEdge = (sourceId: string, targetId: string) => {
-    if (!cy || sourceId.trim() === "" || targetId.trim() === "") return;
-
-    try {
-      const sourceNode = cy.$(`#${sourceId}`);
-      const targetNode = cy.$(`#${targetId}`);
-
-      if (sourceNode.length > 0 && targetNode.length > 0) {
-        cy.add({
-          group: "edges",
-          data: {
-            id: `${sourceId}${targetId}`,
-            source: sourceId,
-            target: targetId,
-          },
-        });
-        cy.layout({ name: "dagre" }).run();
-      }
-    } catch (error) {
-      console.error("Error adding edge:", error);
-    }
+  const resetElement = () => {
+    if (!cy) return;
+    setIsPaused(false);
+    setIsRunning(false);
+    isPausedRef.current = false;
+    isRunningRef.current = false;
+    cy.elements().removeClass("highlighte highlighted found");
   };
-
-  const deleteEdge = (sourceId: string, targetId: string) => {
+  const elementFound = (searchNode: string) => {
     if (!cy) return;
     
-    try {
-      const edgeToRemove = cy.$(`edge[source = "${sourceId}"][target = "${targetId}"]`);
-      if (edgeToRemove.length > 0) {
-        cy.remove(edgeToRemove);
-        cy.layout({ name: "dagre" }).run();
-      }
-    } catch (error) {
-      console.error("Error deleting edge:", error);
+    cy.elements().removeClass("found");
+  
+    const target = cy.getElementById(searchNode);
+    
+    if (target && target.length > 0) {
+      target.addClass("found");
     }
   };
 
-  return {
-    addNode,
-    deleteNode,
-    addEdge,
-    deleteEdge,
+  const iterateAndHighlight = async (elementIds: string[], time: number) => {
+    setIsRunning(true);
+    isRunningRef.current = true;
+
+    for (const id of elementIds) {
+      if (!isRunningRef.current) return;
+
+      while (isPausedRef.current) {
+        await sleep(100);
+        if (!isRunningRef.current) return;
+      }
+
+      highlightElement(id);
+      await sleep(time);
+    }
+    highlightElement(elementIds[-1])
+    setIsRunning(false);
+    isRunningRef.current = false;
   };
+
+  return { highlightElement, resetElement, iterateAndHighlight, togglePause, elementFound };
 };

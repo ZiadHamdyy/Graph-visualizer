@@ -1,6 +1,6 @@
-interface TreeNode {
+interface json {
   val: string;
-  children: TreeNode[];
+  children: json[];
 }
 
 export interface GraphElement {
@@ -11,10 +11,10 @@ export interface GraphElement {
   };
 }
 
-export function treeToGraph(treeData: TreeNode): GraphElement[] {
+export function jsonToGraph(jsonData: json): GraphElement[] {
   const elements: GraphElement[] = [];
   
-  function traverse(node: TreeNode) {
+  function traverse(node: json) {
     // Add node
     elements.push({ data: { id: node.val } });
     
@@ -32,11 +32,11 @@ export function treeToGraph(treeData: TreeNode): GraphElement[] {
     }
   }
   
-  traverse(treeData);
+  traverse(jsonData);
   return elements;
 }
 
-export function graphToTree(elements: GraphElement[]): TreeNode {
+export function graphTojson(elements: GraphElement[]): json {
   // First, separate nodes and edges
   const nodes = elements.filter(el => !el.data.source);
   const edges = elements.filter(el => el.data.source);
@@ -58,15 +58,13 @@ export function graphToTree(elements: GraphElement[]): TreeNode {
     nodeMap.set(source, children);
   });
   
-  // Build tree recursively
-  function buildTree(nodeId: string): TreeNode {
+  function buildTree(nodeId: string): json {
     return {
       val: nodeId,
       children: (nodeMap.get(nodeId) || []).map(childId => buildTree(childId))
     };
   }
   
-  // Find root node (node with no incoming edges)
   const rootId = nodes.find(node => 
     !edges.some(edge => edge.data.target === node.data.id)
   )?.data.id;
@@ -75,28 +73,3 @@ export function graphToTree(elements: GraphElement[]): TreeNode {
   
   return buildTree(rootId);
 }
-
-// Example usage:
-/*
-const treeData = {
-  val: "a",
-  children: [
-    {
-      val: "b",
-      children: [
-        { val: "d", children: [] },
-        { val: "e", children: [] }
-      ]
-    },
-    {
-      val: "c",
-      children: [
-        { val: "f", children: [] }
-      ]
-    }
-  ]
-};
-
-const graphElements = treeToGraph(treeData);
-const backToTree = graphToTree(graphElements);
-*/

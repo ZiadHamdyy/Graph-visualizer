@@ -16,6 +16,7 @@ export default function LeftTopBar({isBarOff, setIsBarOff}: LeftBarProps) {
           alt="Menu icon"
           width={44}
           height={44}
+          priority
           className="cursor-pointer hover:bg-gray-100 rounded-md p-1 transition-colors duration-200"
           onClick={() => setIsBarOff(!isBarOff)}
         />

@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { GraphElement, graphToTree, treeToGraph } from '@/app/utils/JsonParse';
+import { GraphElement, graphTojson, jsonToGraph } from '@/app/utils/JsonParse';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAllElements, setElements } from '@/app/Redux/graphSlice';
+import { setJson } from '@/app/Redux/jsonSlice';
 
 const MonacoEditor = dynamic(
     () => import('@monaco-editor/react'),
     { ssr: false }
 );
 interface JsonType {
-    json: boolean;
-    setJson: React.Dispatch<React.SetStateAction<boolean>>;
+    jsonWindow: boolean;
+    setJsonWindow: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const Json = ({ json, setJson }: JsonType) => {
-    const [jsonValue, setJsonValue] = useState(JSON.stringify({
+const Json = ({ jsonWindow, setJsonWindow }: JsonType) => {
+    const [jsonValue, setJsonValue] = useState<string>(JSON.stringify({
         "val": "a",
         "children": [
             {
@@ -43,15 +44,31 @@ const Json = ({ json, setJson }: JsonType) => {
     const dispatch = useDispatch();
     const elements = useSelector(selectAllElements);
     useEffect(() => {
-        const treeData = graphToTree(elements as GraphElement[]);
-        if (!treeData) return
-        setJsonValue(JSON.stringify(treeData, null, 2));
-    }, [])
-    const DrawGraph = () => {
-        const graphElements = treeToGraph(JSON.parse(jsonValue));
-        console.log(graphElements)
-        dispatch(setElements(graphElements))
-        setJson(false)
+        const treeData = graphTojson(elements as GraphElement[]);
+        if (!treeData) return;
+        
+        const updatedJson = JSON.stringify(treeData, null, 2);
+        
+        if (updatedJson !== jsonValue) {
+            setJsonValue(updatedJson);
+            dispatch(setJson(updatedJson));
+        }
+    }, [elements, dispatch]);
+        const DrawGraph = () => {
+        try {
+
+            const parsedJson = JSON.parse(jsonValue);
+            
+
+            const graphElements = jsonToGraph(parsedJson);
+
+            dispatch(setJson(JSON.stringify(parsedJson, null, 2)));
+            dispatch(setElements(graphElements));
+            setJsonWindow(false);
+            
+        } catch (error) {
+            console.error('Error processing JSON:', error);
+        }
     }
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50">
@@ -59,7 +76,7 @@ const Json = ({ json, setJson }: JsonType) => {
                 <div className="h-12 bg-gray-100 border-b flex items-center justify-between px-4">
                     <div className="flex items-center gap-4 mt-5">
                         <button
-                            onClick={() => setJson(!json)}
+                            onClick={() => setJsonWindow(!jsonWindow)}
                             className="flex items-center gap-2 px-3 py-1.5 text-gray-700 hover:text-gray-900 hover:bg-gray-200 rounded-lg transition-colors duration-200"
                         >
                             <svg
@@ -119,7 +136,7 @@ const Json = ({ json, setJson }: JsonType) => {
                                 minimap: { enabled: false },
                                 fontSize: 14,
                                 wordWrap: 'on',
-                                background: '#F9FAFB',
+                                theme: 'vs-light',
                             }}
                         />
                     </div>

@@ -4,24 +4,22 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 // @ts-expect-error
 import dagre from "cytoscape-dagre";
-import { selectAllElements } from '../Redux/graphSlice';
+import { selectAllElements, setCurrentGraph } from '../Redux/graphSlice';
 
 cytoscape.use(dagre);
 
 export default function Graph() {
   const cyRef = useRef<HTMLDivElement>(null);
   const [cy, setCy] = useState<cytoscape.Core | null>(null);
-  const dispatch = useDispatch();
   const elements = useSelector(selectAllElements);
+  const dispatch = useDispatch();
 
-  // Initialize cytoscape instance
-   // Initialize cytoscape instance
   useEffect(() => {
     if (!cyRef.current) return;
 
     const cyInstance = cytoscape({
       container: cyRef.current,
-      elements: [],  // Start with empty elements
+      elements: [],
       style: [
         {
           selector: "node",
@@ -48,26 +46,56 @@ export default function Graph() {
             "curve-style": "bezier",
           },
         },
+        {
+          selector: '.highlighted',
+          style: {
+            'background-color': '#48bb78',
+            'border-color': '#38a169',
+            'line-color': '#38a169',
+            'target-arrow-color': '#38a169',
+            'transition-property': 'background-color, line-color, target-arrow-color',
+            'transition-duration': 300
+          }
+        },
+        {
+          selector: '.highlighte',
+          style: {
+            'background-color': '#e74c3c',
+            'border-color': '#c0392b',
+            'line-color': '#e74c3c',
+            'target-arrow-color': '#e74c3c',
+            'transition-property': 'background-color, line-color, target-arrow-color',
+            'transition-duration': 300
+          }
+        },
+        {
+          selector: '.found',
+          style: {
+            'background-color': '#9C27B0',
+            'border-color': '#512DA8',
+            'line-color': '#9C27B0',
+            'target-arrow-color': '#9C27B0',
+            'transition-property': 'background-color, line-color, target-arrow-color',
+            'transition-duration': 300
+          }
+        }
       ],
       layout: {
-        name: 'preset'  // Use preset layout initially
+        name: 'preset'
       },
       userZoomingEnabled: true,
       userPanningEnabled: true,
       boxSelectionEnabled: true,
       autounselectify: false,
-      wheelSensitivity: 0.1,
     });
 
     setCy(cyInstance);
     return () => cyInstance.destroy();
   }, []);
 
-  // Handle elements updates
   useEffect(() => {
     if (!cy) return;
 
-    // Update elements with positions
     cy.elements().remove();
     const elemsWithPositions = elements.map(ele => ({
       ...ele,
@@ -75,7 +103,6 @@ export default function Graph() {
     }));
     cy.add(elemsWithPositions);
 
-    // Run layout
     const layout = cy.layout({
       name: "dagre",
       rankdir: "TB",
@@ -88,7 +115,8 @@ export default function Graph() {
     });
 
     layout.run();
-  }, [cy, elements]);
+    dispatch(setCurrentGraph(cy));
+  }, [cy, elements, dispatch]);
 
   return (
     <div ref={cyRef} className="w-full h-full" />
