@@ -45,7 +45,6 @@ const Json = ({ jsonWindow, setJsonWindow }: JsonType) => {
     const elements = useSelector(selectAllElements);
         useEffect(() => {
         const treesData = graphTojson(elements as GraphElement[]);
-        console.log(treesData)
         if (!treesData || treesData.length === 0) return;
         
         const jsonData = treesData.length === 1 ? treesData[0] : treesData;
@@ -55,7 +54,7 @@ const Json = ({ jsonWindow, setJsonWindow }: JsonType) => {
             setJsonValue(updatedJson);
             dispatch(setJson(updatedJson));
         }
-    }, [elements, dispatch]);
+    }, [elements, dispatch, jsonValue]);
         const DrawGraph = () => {
         try {
 

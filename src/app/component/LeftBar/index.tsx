@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import LeftTopBar from './LeftTopBar';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -177,18 +177,18 @@ export default function LeftBar({ isBarOff, setIsBarOff, jsonWindow, setJsonWind
     });
   };
 
-  const updateGraphJson = () => {
+    const updateGraphJson = useCallback(() => {
     const treeData = graphTojson(elements as GraphElement[]);
     if (!treeData) return;
     const jsonString = JSON.stringify(treeData, null, 2);
     dispatch(setJson(jsonString));
-  };
+  }, [elements, dispatch]);
 
   useEffect(() => {
     if (elements.length > 0) {
       updateGraphJson();
     }
-  }, [elements, dispatch])
+  }, [elements, updateGraphJson]);
 
   return (
     <div

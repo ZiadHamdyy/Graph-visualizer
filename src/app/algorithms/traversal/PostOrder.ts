@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import { Graph } from "../dfs";
+import { Graph } from "../search/dfs";
 
 export function postOrderTraversal(graph: Graph, startNode: string): string[] {
   if (!graph[startNode]) {

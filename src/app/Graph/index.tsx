@@ -2,7 +2,7 @@
 import cytoscape from 'cytoscape';
 import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-// @ts-expect-error
+// @ts-expect-error - cytoscape-dagre types are not available
 import dagre from "cytoscape-dagre";
 import { selectAllElements, setCurrentGraph } from '../Redux/graphSlice';
 
@@ -103,7 +103,19 @@ export default function Graph() {
     }));
     cy.add(elemsWithPositions);
 
-    const layout = cy.layout({
+    interface DagreLayoutOptions {
+      name: string;
+      rankdir: string;
+      nodeSep: number;
+      edgeSep: number;
+      rankSep: number;
+      animate: boolean;
+      fit: boolean;
+      padding: number;
+      spacingFactor: number;
+      componentSpacing: number;
+    }
+    const layoutOptions: DagreLayoutOptions = {
       name: "dagre",
       rankdir: "TB",
       nodeSep: 70,
@@ -111,8 +123,11 @@ export default function Graph() {
       rankSep: 100,
       animate: true,
       fit: true,
-      padding: 50
-    });
+      padding: 50,
+      spacingFactor: 1,
+      componentSpacing: 80
+    };
+    const layout = cy.layout(layoutOptions);
 
     layout.run();
     dispatch(setCurrentGraph(cy));
