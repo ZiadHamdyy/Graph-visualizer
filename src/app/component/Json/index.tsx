@@ -4,6 +4,7 @@ import { GraphElement, graphTojson, jsonToGraph } from '@/app/utils/JsonParse';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAllElements, setElements } from '@/app/Redux/graphSlice';
 import { setJson } from '@/app/Redux/jsonSlice';
+import toast from 'react-hot-toast';
 
 const MonacoEditor = dynamic(
     () => import('@monaco-editor/react'),
@@ -43,32 +44,34 @@ const Json = ({ jsonWindow, setJsonWindow }: JsonType) => {
     }, null, 2));
     const dispatch = useDispatch();
     const elements = useSelector(selectAllElements);
-        useEffect(() => {
+    useEffect(() => {
         const treesData = graphTojson(elements as GraphElement[]);
         if (!treesData || treesData.length === 0) return;
-        
+
         const jsonData = treesData.length === 1 ? treesData[0] : treesData;
         const updatedJson = JSON.stringify(jsonData, null, 2);
-        
-        if (updatedJson !== jsonValue) {
-            setJsonValue(updatedJson);
-            dispatch(setJson(updatedJson));
-        }
-    }, [elements, dispatch, jsonValue]);
-        const DrawGraph = () => {
+        setJsonValue(updatedJson);
+        dispatch(setJson(updatedJson));
+    }, [elements, dispatch]);
+    const DrawGraph = () => {
         try {
 
             const parsedJson = JSON.parse(jsonValue);
-            
+
+            if (!parsedJson || typeof parsedJson !== 'object' || !('val' in parsedJson)) {
+                toast.error('Invalid JSON structure.');
+                return;
+            }
 
             const graphElements = jsonToGraph(parsedJson);
 
             dispatch(setJson(JSON.stringify(parsedJson, null, 2)));
             dispatch(setElements(graphElements));
             setJsonWindow(false);
-            
+
         } catch (error) {
             console.error('Error processing JSON:', error);
+            toast.error('Invalid JSON syntax.');
         }
     }
     return (
