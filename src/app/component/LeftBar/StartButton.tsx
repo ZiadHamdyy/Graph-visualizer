@@ -12,25 +12,25 @@ import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 
 interface StartButtonProps {
-  started: boolean;
-  setStarted: (value: boolean) => void;
-  selectedAlgo: string;
-  startNode: string;
-  setIsVisualizing: (value: boolean) => void;
-  setIsPaused: (value: boolean) => void;
-  searchNode: string;
-  delay: number;
+    started: boolean;
+    setStarted: (value: boolean) => void;
+    selectedAlgo: string;
+    startNode: string;
+    setIsVisualizing: (value: boolean) => void;
+    setIsPaused: (value: boolean) => void;
+    searchNode: string;
+    delay: number;
 }
 
-export default function StartButton({ 
-  started, 
-  setStarted, 
-  selectedAlgo, 
-  startNode, 
-  setIsVisualizing, 
-  setIsPaused, 
-  searchNode, 
-  delay 
+export default function StartButton({
+    started,
+    setStarted,
+    selectedAlgo,
+    startNode,
+    setIsVisualizing,
+    setIsPaused,
+    searchNode,
+    delay
 }: StartButtonProps) {
     const currentGraph = useSelector(selectCurrentGraph);
     const currentJson = useSelector(selectJson);

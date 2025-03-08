@@ -1,7 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useState } from 'react'
 import LeftTopBar from './LeftTopBar';
-
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAllElements, selectCurrentGraph } from '../../Redux/graphSlice';
 import { useGraphHighlight } from '@/app/Graph/GraphControllers';
@@ -177,7 +176,7 @@ export default function LeftBar({ isBarOff, setIsBarOff, jsonWindow, setJsonWind
     });
   };
 
-    const updateGraphJson = useCallback(() => {
+  const updateGraphJson = useCallback(() => {
     const treeData = graphTojson(elements as GraphElement[]);
     if (!treeData) return;
     const jsonString = JSON.stringify(treeData, null, 2);

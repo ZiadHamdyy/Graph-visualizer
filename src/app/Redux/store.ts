@@ -1,6 +1,6 @@
-import { configureStore } from '@reduxjs/toolkit';
-import graphReducer from './graphSlice';
-import jsonReducer from './jsonSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import graphReducer from "./graphSlice";
+import jsonReducer from "./jsonSlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,11 +11,11 @@ export const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: {
         // Ignore these action types
-        ignoredActions: ['graph/setCurrentGraph'],
+        ignoredActions: ["graph/setCurrentGraph"],
         // Ignore these field paths in all actions
-        ignoredActionPaths: ['payload.instance'],
+        ignoredActionPaths: ["payload.instance"],
         // Ignore these paths in the state
-        ignoredPaths: ['graph.currentGraph'],
+        ignoredPaths: ["graph.currentGraph"],
       },
     }),
 });

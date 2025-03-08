@@ -7,7 +7,7 @@ interface LeftBarProps {
   setIsBarOff: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function LeftTopBar({isBarOff, setIsBarOff}: LeftBarProps) {
+export default function LeftTopBar({ isBarOff, setIsBarOff }: LeftBarProps) {
   return (
     <div className="border-b border-gray-200 bg-white w-full h-16 flex items-center justify-between">
       <div className="p-2">

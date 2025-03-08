@@ -8,25 +8,25 @@ export default function EdgeManagement() {
 
     const dispatch = useDispatch();
 
-  const AddEdge = () => {
-    if (!sourceNode.trim() || !targetNode.trim()) return;
+    const AddEdge = () => {
+        if (!sourceNode.trim() || !targetNode.trim()) return;
 
-    dispatch(addEdge({
-      group: 'edges',
-      data: { id: `${sourceNode}${targetNode}`, source: sourceNode, target: targetNode },
-    }));
+        dispatch(addEdge({
+            group: 'edges',
+            data: { id: `${sourceNode}${targetNode}`, source: sourceNode, target: targetNode },
+        }));
 
-    setSourceNode('');
-    setTargetNode('');
-  };
-  const DeleteEdge = () => {
-    if (!sourceNode.trim() || !targetNode.trim()) return;
+        setSourceNode('');
+        setTargetNode('');
+    };
+    const DeleteEdge = () => {
+        if (!sourceNode.trim() || !targetNode.trim()) return;
 
-    dispatch(deleteEdge(`${sourceNode}${targetNode}`));
+        dispatch(deleteEdge(`${sourceNode}${targetNode}`));
 
-    setSourceNode('');
-    setTargetNode('');
-  };
+        setSourceNode('');
+        setTargetNode('');
+    };
 
     return (
         <div className="bg-white rounded-2xl shadow-sm space-y-3">

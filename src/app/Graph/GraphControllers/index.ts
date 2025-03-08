@@ -31,11 +31,11 @@ export const useGraphHighlight = (cy: cytoscape.Core | null) => {
   };
   const elementFound = (searchNode: string) => {
     if (!cy) return;
-    
+
     cy.elements().removeClass("found");
-  
+
     const target = cy.getElementById(searchNode);
-    
+
     if (target && target.length > 0) {
       target.addClass("found");
     }
@@ -44,7 +44,7 @@ export const useGraphHighlight = (cy: cytoscape.Core | null) => {
   const iterateAndHighlight = async (elementIds: string[], time: number) => {
     setIsRunning(true);
     isRunningRef.current = true;
-    let complete = false
+    let complete = false;
     for (const id of elementIds) {
       if (!isRunningRef.current) return;
 
@@ -56,12 +56,18 @@ export const useGraphHighlight = (cy: cytoscape.Core | null) => {
       highlightElement(id);
       await sleep(time);
     }
-    highlightElement(elementIds[-1])
+    highlightElement(elementIds[-1]);
     setIsRunning(false);
     isRunningRef.current = false;
-    complete = true
-    return complete
+    complete = true;
+    return complete;
   };
 
-  return { highlightElement, resetElement, iterateAndHighlight, togglePause, elementFound };
+  return {
+    highlightElement,
+    resetElement,
+    iterateAndHighlight,
+    togglePause,
+    elementFound,
+  };
 };
