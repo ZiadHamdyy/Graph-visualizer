@@ -58,11 +58,6 @@ const Json = ({ jsonWindow, setJsonWindow }: JsonType) => {
 
             const parsedJson = JSON.parse(jsonValue);
 
-            if (!parsedJson || typeof parsedJson !== 'object' || !('val' in parsedJson)) {
-                toast.error('Invalid JSON structure.');
-                return;
-            }
-
             const graphElements = jsonToGraph(parsedJson);
 
             dispatch(setJson(JSON.stringify(parsedJson, null, 2)));
