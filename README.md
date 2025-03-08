@@ -60,21 +60,3 @@
 </div>
 
 <br/>
-
-<hr/>
-
-<h2 align="center">🚀 Getting Started 🚀</h2>
-<br>
-<div align="center">
-
-### Prerequisites
-
-- Node.js (version 14.x or later)
-- npm or yarn
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/next-app.git
-   cd next-app
